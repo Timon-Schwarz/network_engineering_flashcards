@@ -5,11 +5,7 @@ Global baseline configuration,"configure  terminal
   enable algorithm [type] secret [password]
   service password-encryption
   ip domain-name [name]
-  no ip domain-lookup
-  crypto key generate rsa usage mod {360-4096}
-  ip ssh version {1|2}
-  ip ssh authentication-retries [number]
-  ip ssh time-out [seconds]",Setup
+  no ip domain-lookup",Setup
 Console line baseline configuration,"configure terminal
   line console 0
     logging sync
@@ -42,7 +38,7 @@ Router interface static link configuration,"! It is debatable whether static or 
 configure terminal
   interface range [range]
   speed [highest link speed]
-  duplex {half|full}",Setup
+  duplex {half | full}",Setup
 Switch interface static link configuration,"! It is debatable whether static or auto is best practice for link configuration
 ! auto is the default
 
@@ -50,11 +46,11 @@ configure terminal
   interface range [range]
   no negotiation auto
   speed [highest link speed]
-  duplex {half|full}",Setup
+  duplex {half | full}",Setup
 Basic timezone configuration,"configure terminal
-  clock timezone [name] [hours offset] [minutes offset]",Time
+  clock timezone [name] [hours offset] [minutes offset]",Setup Time
 Automatic adjustment for daylight savings time configuration,"configure terminal
-  clock summer-time [name] recurring",Time
+  clock summer-time [name] recurring",Setup Time
 BGP network advertisement configuration,"configure terminal
   router bgp [AS]
     network [IP] mask [mask]",BGP
@@ -87,7 +83,7 @@ BGP MED manipulation for peer configuration,"configure terminal
   route-map [name] permit [number]
     set metric [number]
     ! If route-map should only be applied for specific prefixes
-    match-address [ACL name]
+    match ip address [ACL name]
   router bgp [AS]
     neighbor [IP] remote-as [AS]
     neighbor [IP] route-map [name] out",BGP
@@ -95,7 +91,7 @@ BGP local preference manipulation configuration,"configure terminal
   route-map [name] permit [number]
     set local-preference [number]
     ! If route-map should only be applied for specific prefixes
-    match-address [ACL name]
+    match ip address [ACL name]
   router bgp [AS]
     neighbor [IP] remote-as [AS]
     neighbor [IP] route-map [name] in",BGP
@@ -103,15 +99,15 @@ BGP weight manipulation configuration,"configure terminal
   route-map [name] permit [number]
     set weight [number]
     ! If route-map should only be applied for specific prefixes
-    match-address [ACL name]
+    match ip address [ACL name]
   router bgp [AS]
     neighbor [IP] remote-as [AS]
     neighbor [IP] route-map [name] in",BGP
 Well-known community for prefixes sent by a eBGP peer configuration,"configure terminal
     route-map [name] permit [number]
-      set community {internet|no-advertise|no-export|local-as}
+      set community {internet | no-advertise | no-export | local-as}
     ! If route-map should only be applied for specific prefixes
-    match-address [ACL name]
+    match ip address [ACL name]
   router bgp [AS]
     neighbor [eBGP IP] remote-as [AS]
     neighbor [eBGP IP] route-map [name] in
@@ -119,9 +115,9 @@ Well-known community for prefixes sent by a eBGP peer configuration,"configure t
     neighbor [iBGP IP] send-community",BGP
 Well-known community for prefixes sent to a peer BGP configuration,"configure terminal
     route-map [name] permit [number]
-      set community {internet|no-advertise|no-export|local-as}
+      set community {internet | no-advertise | no-export | local-as}
     ! If route-map should only be applied for specific prefixes
-    match-address [ACL name]
+    match ip address [ACL name]
   router bgp [AS]
     neighbor [IP] remote-as [AS]
     neighbor [IP] route-map [name] out
@@ -158,49 +154,49 @@ Basic named EIGRP IPv6 configuration,"configure terminal
         no passive-interface        ",EIGRP
 Named EIGRP authentication configuration,"configure terminal
   router eigrp [name]
-    address-family ipv{4|6} autonomous-system [number]
+    address-family ipv{4 | 6} autonomous-system [number]
       af-interface [interface]
         authentication mode [algorithm] [password]",EIGRP
 Named EIGRP summary route configuration,"configure terminal
   router eigrp [name]
-    address-family ipv{4|6} autonomous-system [number]
+    address-family ipv{4 | 6} autonomous-system [number]
       af-interface [interface]
-        summary-address [[IP] [mask]|[IPv6]/[prefix length]]",EIGRP
+        summary-address [[IP] [mask] | [IPv6]/[prefix length]]",EIGRP
 Convert numberd EIGRP configuration to named EIGRP configuration,"configure terminal
   router eigrp [number]
     eigrp upgrade-cli",EIGRP
 Named EIGRP route redistribution configuration,"configure terminal
   router eigrp [name]
-    address-family ipv{4|6} autonomous-system [number]
+    address-family ipv{4 | 6} autonomous-system [number]
       topology base
         redistribute [source] [options]",EIGRP
 Enable IPv4 routing and CEF,"configure terminal
   ip routing
-  ip cef",IPv4
+  ip cef",Routing
 Enable IPv6 routing and CEF,"configure terminal
   ipv6 unicast-routing
   ipv6 multicast-routing
-  ipv6 cef",IPv6
-Basic IPv4 interface configuration,"configure terminal
+  ipv6 cef",Routing
+Basic IPv4 configuration,"configure terminal
   interface [interface]
-    ip address [IP] [mask]",IPv4
-Basic IPv6 interface configuration,"configure terminal
+    ip address [IP] [mask]",Routing
+Basic IPv6 configuration,"configure terminal
   interface [interface]
     ipv6 enable
-    ipv6 address [IPv6]/[prefix length]",IPv6
+    ipv6 address [IPv6]/[prefix length]",Routing
 Enable routing on Multi-Layer-Switch (MLSW) interface,"! IPv4 routing must be enabled globally beforehand
 
 configure terminal
   interface [interface]
-    no switchport",IPv4;IPv6
+    no switchport",Routing
 Basic IPv4 static route configuration,"configure terminal
-  ip route [IP] [mask] [exit-interface] [next-hop IP]",Static routing
+  ip route [IP] [mask] [exit-interface] [next-hop IP]",Routing
 Floating IP static route configuration with tracking,"configure terminal
-  ip route [IP] [mask] [exit-interface] [next-hop IP] [AD] track [number]",Static routing
+  ip route [IP] [mask] [exit-interface] [next-hop IP] [AD] track [number]",Routing
 Basic IPv6 static route configuration,"configure terminal
-  ipv6 route [IPv6]/[prefix length] [exit-interface] [next-hop IPv6]",Static routing
+  ipv6 route [IPv6]/[prefix length] [exit-interface] [next-hop IPv6]",Routing
 Floating IPv6 static route configuration with tracking,"configure terminal
-  ipv6 route [IPv6]/[prefix length] [exit-interface] [next-hop IPv6] [AD] track [number]",Static routing
+  ipv6 route [IPv6]/[prefix length] [exit-interface] [next-hop IPv6] [AD] track [number]",Routing
 Basic MPLS with OSPF configuration,"! OSPF must already be working beforehand
 ! The LSR-IDs used by LDP must be advertised within OSPF
 
@@ -215,7 +211,7 @@ Basic OSPFv2 configuration,"configure terminal
     no passive-interface [interface]",OSPF
 OSPFv2 network type configuration,"configure terminal
   interface [interface]
-    ip ospf network {broadcast|non-broadcast|point-to-point|point-to-multipoint|point-to-multipoint non-broadcast}",OSPF
+    ip ospf network {broadcast | non-broadcast | point-to-point | point-to-multipoint | point-to-multipoint non-broadcast}",OSPF
 OSPv2 priority configuration,"configure terminal
   interface [interface]
     ip ospf priority {0-255}",OSPF
@@ -240,7 +236,7 @@ OSPFv2 default route advertisement configuration,"configure terminal
     default-information originate always",OSPF
 OSPFv2 redistribution configuration,"configure terminal
   router ospf [number]
-      redistribute [source]",OSPF
+      redistribute [source] [options]",OSPF
 OSPFv2 inter-area summary route configuration,"configure terminal
   router ospf [number]
     area [number] range [IP] [mask]",OSPF
@@ -253,40 +249,40 @@ Basic OSPFv3 configuration,"configure terminal
     area [number]
     passive-interface default
     no passive-interface [interface]
-    address-family ipv{4|6}
+    address-family ipv{4 | 6}
   interface [interface]
-    ospfv3 [number] ipv{4|6} area [number]",OSPF
+    ospfv3 [number] ipv{4 | 6} area [number]",OSPF
 OSPFv3 reference bandwidth configuration,"configure terminal
   router ospfv3 [number]
     auto-cost reference-bandwidth [Mbps]",OSPF
 OSPFv3 redistribution configuration,"configure terminal
   router ospfv3 [number]
-    address-family ipv{4|6}
-      redistribute [source]",OSPF
+    address-family ipv{4 | 6}
+      redistribute [source] [options]",OSPF
 OSPFv3 authentication configuration,"configure terminal
   interface [interface]
-    ospfv3 authentication ipsec spi [number] [algorithm] {0|7} [authentication key]",OSPF
+    ospfv3 authentication ipsec spi [number] [algorithm] {0 | 7} [authentication key]",OSPF
 OSPFv3 authentication and encryption configuration,"configure terminal
   interface [interface]
-    ospfv3 encryption ipsec spi [number] esp [algorithm] {0|7} [encryption key] [algorithm] {0|7} [authentication key]",OSPF
+    ospfv3 encryption ipsec spi [number] esp [algorithm] {0 | 7} [encryption key] [algorithm] {0 | 7} [authentication key]",OSPF
 OSPFv3 default route advertisement configuration,"configure terminal
   router ospfv3 [number]
-    address-familiy ipv{4|6}
+    address-familiy ipv{4 | 6}
       default-information originate always",OSPF
 OSPFv3 priority configuration,"configure terminal
   interface [interface]
     ospfv3 [number] priority {0-255}",OSPF
 OSPFv3 network  type configuration,"configure terminal
   interface [interface]
-    ospfv3 [number] network {broadcast|non-broadcast|point-to-point|point-to-multipoint|point-to-multipoint non-broadcast}",OSPF
+    ospfv3 [number] network {broadcast | non-broadcast | point-to-point | point-to-multipoint | point-to-multipoint non-broadcast}",OSPF
 OSPFv3 inter-area summary route configuration,"configure terminal
   router ospfv3 [number]
-    address-familiy ipv{4|6}
-      area [number] range [[IP] [mask]|[IPv6]/[prefix length]]",OSPF
+    address-familiy ipv{4 | 6}
+      area [number] range [[IP] [mask] | [IPv6]/[prefix length]]",OSPF
 OSPFv3 inter-AS summary route configuration,"configure terminal
   router ospfv3 [number]
-    address-familiy ipv{4|6}
-      summary-prefix [[IP] [mask]|[IPv6]/[prefix length]]",OSPF
+    address-familiy ipv{4 | 6}
+      summary-prefix [[IP] [mask] | [IPv6]/[prefix length]]",OSPF
 Basic RIPv2 configuration,"configure terminal
   router rip
     version 2
@@ -322,42 +318,42 @@ Basic RADIUS configuration,"configure terminal
     address ipv4 [IP] auth-port [port] acct-port [port]
     key [password]
   ip radius source-interface [interface]",AAA
-Create a privilege level which has access one specific command in configuration mode configuration,"configure terminal
+Create a privilege level which has access to one specific command in configuration mode,"configure terminal
   privilege exec level {0-15} configure terminal
   privilege configure level {0-15} [command]",AAA
-Create a privilege level which has access all interface commands starting with a keyword configuration,"configure terminal
+Create a privilege level which has access to all interface commands starting with a keyword,"configure terminal
   privilege exec level {0-15] configure terminal
   privilege configure level {0-15} interface
   privilege interface all level {0-15} [keyword]",AAA
 Create layer 3 IPv4 ACL,"configure terminal
   ip access-list extended [name]
-    [number] {permit|deny} [protocol] [source match] [destination match] [options]",ACL
+    [number] {permit | deny} [protocol] [source match] [destination match] [options]",ACL
 Create layer 4 IPv4 ACL,"configure terminal
   ip access-list extended [name]
-    [number] {permit|deny} [protocol] [source match] [destination match] {eq|gr|le} [port] [options]",ACL
+    [number] {permit | deny} {udp | tcp} [source match] [destination match] {eq | gr | le} [port] [options]",ACL
 Apply IPv4 ACL on interface,"configure terminal
   interface [interface]
-    access-group [name] {in|out}",ACL
+    ip access-group [name] {in | out}",ACL
 Apply IPv6 ACL on interface,"configure terminal
   interface [interface]
-    ipv6 traffic-filter [name] {in|out}",ACL
+    ipv6 traffic-filter [name] {in | out}",ACL
 Apply IPv4 ACL on line,"configure terminal  
   line [type] [number]
-    access-class [name] {in|out}",ACL
+    access-class [name] {in | out}",ACL
 Apply IPv6 ACL on line,"configure terminal  
   line [type] [number]
-    ipv6 access-class [name] {in|out}",ACL
+    ipv6 access-class [name] {in | out}",ACL
 Create layer 3 IPv6 ACL,"configure terminal
   ipv6 access-list [name]
-    sequence [number] {permit|deny} [protocol] [source match] [destination match]",ACL
+    sequence [number] {permit | deny} [protocol] [source match] [destination match] [options]",ACL
 Create layer 4 IPv6 ACL,"configure terminal
   ipv6 access-list [name]
-    sequence [number] {permit|deny} [protocol] [source match] [destination match] {eq|gr|le} [port]",ACL
+    sequence [number] {permit | deny} {udp | tcp} [source match] [destination match] {eq | gr | le} [port] [options]",ACL
 Create reflexive IPv4 ACL,"configure terminal
   ip access-list extended [name] 
-    [number] {permit|deny} [protocol] [source match] [destination match] [options] reflect [name]
+    [number] {permit | deny} [protocol] [source match] [destination match] [options] reflect [name]
   ip access-list extended [name]
-    evaluate [name]",ACL
+    [number] evaluate [name]",ACL
 Basic CBAC configuration,"configure terminal
   ip inspect name [name] [protocol]
   interface [interface] 
@@ -374,66 +370,79 @@ Dynamic ARP Inspection (DAI) configuration with DHCP Snooping and static filter,
 
 configure terminal
   arp access-list [name]
-    permit ip host [IP] mac host [MAC]
+    {permit | deny} {request | response} ip host [IP] mac host [MAC]
   ip arp inspection filter [name] vlan [VLAN]",DAI
 Dynamic ARP Inspection (DAI) configuration with static entries,"configure terminal
   arp access-list [name]
-    permit ip host [IP] mac host [MAC]
+    {permit | deny} {request | response} ip host [IP] mac host [MAC]
   ip arp inspection filter [name] vlan [VLAN] static",DAI
 Dynamic ARP Inspection (DAI) additional validation configuration,"configure terminal
-  ip arp inspection validate {src-mac|dst-mac|ip}",DAI
+  ip arp inspection validate {src-mac | dst-mac | ip}",DAI
 Dynamic ARP Inspection (DAI) rate limit configuration,"configure terminal
   interface [interface]
     ip arp inspection limit rate [packets per seconds]",DAI
+Automatically recover interface after ARP inspection violation,"configure terminal
+  errdisable recovery interval [seconds]
+  errdisable recovery cause arp-inspection",DAI
 Basic DHCP Snooping configuration,"configure terminal
   ip dhcp snooping
   ip dhcp snooping vlan [VLAN range]
+  no ip dhcp snooping information option
   interface range [range]
-    ip dhcp snooping trust",DHCP Snooping
+    ip dhcp snooping trust",DHCP-Snooping
 DHCP snooping rate limit configuration,"configure terminal
   interface [interface]
-    ip dhcp snooping limit rate [packets per seconds]",DHCP Snooping
-DHCP snooping compatibility for DHCP servers that do no work with option 82 configuration,"configure terminal
-  no ip dhcp snooping information option",DHCP Snooping
+    ip dhcp snooping limit rate [packets per seconds]",DHCP-Snooping
+Automatically recover interface after DHCP rate limit violation,"configure terminal
+  errdisable recovery interval [seconds]
+  errdisable recovery cause dhcp-rate-limit",DHCP-Snooping
 Basic Port-Seucrity configuration,"configure terminal
   switchport port-security
   switchport port-security max [number]
-  switchport port-security mac {[mac]|sticky}
-  switchport port-security violation {protect|restrict|shutdown}",Port-Security
+  switchport port-security mac {[mac] | sticky}
+  switchport port-security violation {protect | restrict | shutdown}",Port-Security
 Automatically recover interface after Port-Security shutdown violation,"configure terminal
   errdisable recovery interval [seconds]
   errdisable recovery cause psecure-violation",Port-Security
-Basic ZBF configuration,"configure terminal
+Basic ZBF class-map configuration which matches an ACL,"configure terminal
+    class-map type inspect [name]
+      match access-group name [ACL name]",ZBF
+Basic ZBF class-map configuration which matches a protocol,"configure terminal
+    class-map type inspect [name]
+      match protocol [protocol]",ZBF
+Basic ZBF policy-map configuration,"configure terminal
+  policy-map type inspect [name]
+    class type inspect [class-map name]
+      {accept | inspect | drop}",ZBF
+Basic ZBF zone pair configuration,"configure terminal
   zone security [zone name1]
   zone security [zone name2]
-  class-map type inspect [CMAP name]
-    match access-group name [ACL name]
-    match protocol [protocol]
-  policy-map type inspect [PMAP name]
-    class type inspect [CMAP name]
-      {accept|inspect|drop}
-  zone-pair security source [zone name1] dest [zone name2]
-    service-policy type inspect [PMAP name]
+  zone-pair security source [zone name1] destination [zone name2]
+    service-policy type inspect [policy-map name]
   interface [interface]
     zone-member security [zone name1]
   interface [interface]
     zone-member security [zone name2]",ZBF
-ZBF zone-pair for traffic for the local host,"configure terminal
-  zone-pair security source [name] dest Self",ZBF
+ZBF self zone zone-pair configuration,"configure terminal
+  zone security [zone]
+  zone-pair security source {zone | Self} destination {zone | Self}
+    service-policy type inspect [policy-map name]
+  interface [interface]
+    zone-member security [zone]",ZBF
 Basic PAGP Etherchannel configuration,"configure terminal
   interface range [range]
-    channel-group [number] mode {desirable|auto}
-  interface port-group [number]",Etherchannel
+    channel-group [number] mode {desirable | auto}
+  interface port-channel [number]",Etherchannel
 Basic LACP Etherchannel configuration,"configure terminal
   interface range [range]
-    channel-group [number] mode {active|passive}
-  interface port-group [number]",Etherchannel
+    channel-group [number] mode {active | passive}
+  interface port-channel [number]",Etherchannel
 Basic manual Etherchannel configuration,"configure terminal
   interface range [range]
     channel-group [number] mode on
-  interface port-group [number]",Etherchannel
+  interface port-channel [number]",Etherchannel
 Etherchannel load-balancing configuration,"configure terminal
-  port-channel load-balance {dst-ip|dst-mac|src-dst-ip|src-dst-mac|src-ip|src-mac}",Etherchannel
+  port-channel load-balance {dst-ip | dst-mac | src-dst-ip | src-dst-mac | src-ip | src-mac}",Etherchannel
 Rapid-PVST+ root bridge configuration,"configure terminal
   spanning-tree mode rapid-pvst
   spanning-tree vlan [VLAN] priority 0",STP
@@ -446,31 +455,32 @@ Rapid-PVST+ none root bridge configuration,"configure terminal
 Rapid-PVST+ interface priority configuration,"configure terminal
   interface [interface]
     spanning-tree vlan [VLAN] port-priority {0-255}",STP
-Rapid-PVST+ automatic BPDU guard on portfast interfaces configuration,"configure terminal
-  interface [interface]
-    spanning-tree vlan portfast bpduguard default",STP
-Rapid-PVST+ automatic portfast on access interfaces configuration,"configure terminal
-  interface [interface]
-    spanning-tree vlan portfast default",STP
-Rapid-PVST+ portfast and BPDU guard configuration,"configure terminal
+Enable BPDU guard on Portfast Edge interfaces,"configure terminal
+    spanning-tree portfast edge bpduguard default",STP
+Enable Portfast Edge on all access interfaces,"configure terminal
+    spanning-tree portfast edge default",STP
+Enable Portfast Edge and BPDU Guard on specific interface,"configure terminal
   interface [interface]
     spanning-tree bpduguard enable
-    spanning-tree portfast",STP
-Rapid-PVST+ uplinkfast configuration,"configure terminal
+    spanning-tree portfast edge",STP
+Enable STP Uplinkfast,"configure terminal
   spanning-tree uplinkfast",STP
-Rapid-PVST+ backbonefast configuration,"configure terminal
+Enable STP Backbonefast,"configure terminal
   spanning-tree backbonefast",STP
-Rapid-PVST+ loop guard global configuration,"configure terminal
+Enable STP Loop Guard on all interfaces,"configure terminal
     spanning-tree loopguard default",STP
-Rapid-PVST+ loop guard interface configuration,"configure terminal
+Enable Loop Guard on one specific interface,"configure terminal
   interface [interface]
-    spanning-tree guard root",STP
-Rapid-PVST+: BPDU filter interface configuration,"configure terminal
+    spanning-tree loopguard enable",STP
+Enable BPDU Filter on one specific interface,"configure terminal
   interface [interface]
     spanning-tree bpdufilter enable",STP
-Rapid-PVST+ root guard interface configuration,"configure terminal
+Enable Root Guard on one specific interface,"configure terminal
   interface [interface]
     spanning-tree guard root",STP
+Automatically recover interface after BPDU Guard violation,"configure terminal
+  errdisable recovery interval [seconds]
+  errdisable recovery cause bpduguard",STP
 Which VLAN-IDs exist per default?,"1
 1002
 1003
@@ -486,33 +496,32 @@ Basic VTPv2 server configuration,"! VLANs have to be created manually beforehand
 configure terminal
   vtp domain [domain]
   vtp version 2
-  vtp mode server
-  vtp pruning",VLAN
+  vtp mode server",VLAN VTP
 Basic VTPv2 client configuration,"configure terminal
   vtp domain [domain]
   vtp version 2
-  vtp mode client",VLAN
+  vtp mode client",VLAN VTP
 VTPv2 authentication configuration,"configure terminal
-  vtp password [password]",VLAN
+  vtp password [password]",VLAN VTP
 VTP automatic VLAN pruning configuration,"configure terminal
-  vtp pruning",VLAN
+  vtp pruning",VLAN VTP
 Basic VTPv3 primary server configuration,"! VLANs have to be created manually beforehand
 
 configure terminal
   vtp domain [domain]
   vtp version 3
   vtp mode server
-  vtp primary force",VLAN
+  vtp primary force",VLAN VTP
 Basic VTPv3 backup server configuration,"configure terminal
   vtp domain [domain]
   vtp version 3
-  vtp mode server",VLAN
+  vtp mode server",VLAN VTP
 Basic VTPv3 client configuration,"configure terminal
   vtp domain [domain]
   vtp version 3
-  vtp mode client",VLAN
+  vtp mode client",VLAN VTP
 VTPv3 authentication configuration,"configure terminal
-  vtp password [password] {hidden|secret}",VLAN
+  vtp password [password] {hidden | secret}",VLAN VTP
 Static trunk port configuration,"configure terminal
   interface [interface]
     switchport trunk encapsulation dot1q
@@ -533,27 +542,27 @@ configure terminal
     switchport trunk nativ vlan [VLAN]
     switchport trunk allowed vlan [range]
     switchport access vlan [VLAN]
-    switchport mode dynamic {dynamic|desirable}",VLAN
+    switchport mode dynamic {dynamic | desirable}",VLAN DTP
 SVI IPv6 inter-vlan routing configuration,"! IPv6  routing must be enabled beforehand
 
 configure terminal
   interface [VLAN]
     ipv6 enable
     ipv6 address [IPv6]/[prefix length]
-    no shut",VLAN
+    no shut",VLAN Routing
 SVI IPv4 inter-vlan routing configuration,"! IPv4  routing must be enabled beforehand
 
 configure terminal
   interface [VLAN]
     ip address [IP] [mask]
-    no shut",VLAN
+    no shut",VLAN Routing
 ROAS IPv4 inter-vlan routing configuration,"configure terminal
   interface [physical interface]
     no shut
   interface [physical interface].[VLAN]
     encapsulation dot1q [VLAN]
     ip address [IP] [mask]
-    no shut",VLAN
+    no shut",VLAN Routing
 ROAS IPv6 inter-vlan routing configuration,"configure terminal
   interface [physical interface]
     no shut
@@ -561,7 +570,7 @@ ROAS IPv6 inter-vlan routing configuration,"configure terminal
     encapsulation dot1q [VLAN]
     ipv6 enable
     ipv6 address [IPv6]/[prefix length]
-    no shut",VLAN
+    no shut",VLAN Routing
 Basic phase 3 DMVPN hub configuration,"configure terminal
   interface tunnel [number]
     ip address [IP] [mask]
@@ -616,7 +625,7 @@ Basic phase 3 DMVPN single cloud multi hub spoke configuration,"configure termin
     tunnel key [number]",DMVPN
 DMVPN IPsec IPsec configuration,"configure terminal
   interface tunnel [number]
-  tunnel protection ipsec profile [name]",DMVPN
+  tunnel protection ipsec profile [name]",DMVPN IPsec
 Basic GRE configuration,"configure terminal
   interface tunnel [number]
     ip address [IP] [mask]
@@ -651,8 +660,8 @@ Basic IKEv1/ISAKMP/IPsec VPN configuration with VTI,"configure terminal
   crypto ipsec profile [name]
     set transform-set [name]
   int tun [number]
+    ip address [IP] [mask]
     tunnel mode ipsec ipv4
-    ip addrress [IP] [mask]
     tunnel source [interface]
     tunnel destination [peer IP]
     tunnel protection ipsec profile [name]",IPsec
@@ -710,13 +719,13 @@ IKEv2/IPsec VPN keyring configuration for DMVPN,"configure terminal
   crypto ikev2 keyring [name]
     peer [name]
       address 0.0.0.0
-      pre-shared-key [password]",IPsec
+      pre-shared-key [password]",IPsec DMVPN
 IKEv2/IPsec VPN profile configuration for DMVPN,"configure terminal  
   crypto ikev2 profile [name]
     identity remote any
     authentication local pre-share
     authentication remote pre-share
-    keyring local [name]",IPsec
+    keyring local [name]",IPsec DMVPN
 Basic PPPoE client configuration,"configure terminal
   interface [interface]
     pppoe-client dial-pool-number [number]
@@ -733,11 +742,11 @@ Bidirectional CHAP authentication PPPoeE client configuration,"configure termina
     ppp chap hostname [username on  server]
     ppp chap password [password on server]
     ! If server and client both use the same username
-    no ppp chap ignoreus",PPPoE
+    no ppp chap ignoreus",PPPoE CHAP
 Unidirectional CHAP authentication PPPoeE client configuration,"configure terminal
   interface dialer [number]    
     ppp chap hostname [username on  server]
-    ppp chap password [password on server]",PPPoE
+    ppp chap password [password on server]",PPPoE CHAP
 Basic PPPoE server configuration,"configure terminal
   bba-group pppoe [name]
     virtual-template [number]  
@@ -757,15 +766,15 @@ Bidirectional CHAP authentication PPPoE server configuration,"configure terminal
     ppp chap hostname [username on  client]
     ppp chap password [password on client]
     ! If server and client both use the same username
-    no ppp chap ignoreus",PPPoE
+    no ppp chap ignoreus",PPPoE CHAP
 Unidirectional CHAP authentication PPPoE server configuration,"configure terminal
   username [username] password [password]
   interface virtual-template [number]
-    ppp authentication chap",PPPoE
+    ppp authentication chap",PPPoE CHAP
 Basic SSH server configuration,"configure terminal
-  crypto key generate rsa usage-keys modulo [length] label [label]
-  ip ssh key-pair [label]
-  ip ssh version 2",SSH
+  ip ssh version {1 | 2}
+  crypto key generate rsa usage-keys modulo {360-4096} label [label]
+  ip ssh key-pair [label]",SSH
 SSH server retry limit configuration,"configure terminal
   ip ssh authentication-retries [number]
   ip ssh time-out [seconds]",SSH
@@ -803,16 +812,16 @@ Basic DHCP client configuration,"configure  terminal
   interface [interface]
     ip address dhcp",DHCP
 Basic NTP client configuration,"configure terminal
-  ntp server [IP]",NTP
+  ntp server [IP] source [interface]",Time NTP
 Basic Standalone NTP server configuration,"configure terminal
-  ntp master [stratum]",NTP
+  ntp master [stratum]",Time NTP
 Basic NTP client and server configuration,"configure terminal
   ntp server [IP] source [interface]
-  ntp master",NTP
+  ntp master",Time NTP
 NTP authentication configuration,"configure terminal
-  ntp authentication-key [ID] [algorithm] [password]
-  ntp trusted-key [ID]
-  ntp authenticate",NTP
+  ntp authentication-key [number] [algorithm] [password]
+  ntp trusted-key [number]
+  ntp authenticate",Time NTP
 PAT configuration,"configure terminal
   ip nat inside source list [ACL name] interface [outside interface] overload
   interface [inside interface]
@@ -834,8 +843,6 @@ Conditional static NAT configuration,"configure terminal
   interface [outside interface]
     ip nat outside",NAT
 Port forwarding configuration,"configure terminal
-  route-map [name] permit [number]
-    match ip address [ACL name]
   ip nat inside source static [protocol] [inside IP] [inside port] [outside IP] [outside port] extendable
   interface [inside interface]
     ip nat inside
@@ -849,14 +856,14 @@ Dynamic NAT configuration,"configure terminal
   interface [outside interface]
     ip nat outside",NAT
 Static NAT64 configuration,"configure terminal
-  nat v6v4 static [IPv6] [IPv4]
+  nat64 v6v4 static [IPv6] [IPv4]
   interface [inside interface]
     nat64 enable
   interface [outside interface]
     nat64 enable",NAT64
 Dynamic NAT64 configuration,"configure terminal
   nat64 v4 pool [name] [first IPv4] [last IPv4]
-  nat v6v4 list [ACL name] pool [name] overload
+  nat64 v6v4 list [ACL name] pool [name] overload
   interface [inside interface]
     nat64 enable
   interface [outside interface]
@@ -876,15 +883,19 @@ Basic 6 to 4 tunneling configuration,"configure terminal
     tunnel source [interface]
     tunnel mode ipv6ip 6to4
     ipv6 enable
-  ipv6 route 2002::/16 tunnel[number]",6 to 4 tunneling
+  ipv6 route 2002::/16 tunnel[number]",6to4-Tunneling
 Basic VRRPv2 configuration,"configure terminal
   interface [interface]
     vrrp [number] ip [IP]
     vrrp [number] priority [1-254]
-    vrrp [number] preempt delay minimum [seconds]",VLAN
+    vrrp [number] preempt delay minimum [seconds]",VRRP
 VRRPv2 authentication configuration,"configure terminal
+  key chain [name]
+    key [number]
+      cryptographic-algorithm [algorithm]
+      key-string [password]
   interface [interface]
-    vrrp [number] authentication [algorithm] [password]",VRRP
+    vrrp [number] authentication [algorithm] key-chain [name]",VRRP
 VRRPv2 tracking object configuration,"configure terminal
   interface [interface]
     vrrp [number] track [number] decrement [number]",VRRP
@@ -930,8 +941,12 @@ HSRP tracking object configuration,"configure terminal
   interface [interface]
     standby [number] track [number] decrement [number]",HSRP
 HSRP authentication configuration,"configure terminal
+  key chain [name]
+    key [number]
+      cryptographic-algorithm [algorithm]
+      key-string [password]
   interface [interface]
-    standby [number] authentication [algorithm] key-string [password]",HSRP
+    standby [number] authentication [algorithm] key-chain [name]",HSRP
 Basic GLBP IPv4 configuration,"configure terminal
   interface [interface]
     glbp [number] ip [IP]
@@ -948,8 +963,12 @@ GLBP tracking object configuration,"configure terminal
     glbp [number] weighting [number] lower [number] upper [number]
     glbp [number] weighting track [number] decrement [number]",GLBP
 GLBP authentication configuration,"configure terminal
+  key chain [name]
+    key [number]
+      cryptographic-algorithm [algorithm]
+      key-string [password]
   interface [interface]
-    glbp [number] authentication [algorithm] key-string [password]",GLBP
+    glbp [number] authentication [algorithm] key-chain [name]",GLBP
 GLBP load balacing configuration,"configure terminal
   interface [interface]
-    glbp [number] load-balancing {host-dependent|round-robin|weighted}",GLBP
+    glbp [number] load-balancing {host-dependent | round-robin | weighted}",GLBP
