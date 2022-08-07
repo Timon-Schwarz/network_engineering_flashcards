@@ -12,7 +12,7 @@ Console line baseline configuration,"configure terminal
     login local
     exec-timeout [minutes] [seconds]",Setup
 VTY line baseline configuration,"configure terminal
-  line vty <first number> <last number>
+  line vty [first number] [last number]
     logging sync
     login local
     exec-timeout [minutes] [seconds]
@@ -73,58 +73,26 @@ eBGP peering via loopback configuration,"configure terminal
     neighbor [IP] ebgp-multi-hop 2",BGP
 BGP Route Reflector (RR) configuration,"configure terminal
   router bgp [AS]        
-    neighbor [IP] remote-as [AS]
     neighbor [IP] route-reflector-client ",BGP
 BGP default route advertisement configuration,"configure terminal
   router bgp [AS]        
-    neighbor [IP] remote-as [AS]
     neighbor [IP] default-originate",BGP
-BGP MED manipulation for peer configuration,"configure terminal
+BGP path selection attribute manipulation configuration,"configure terminal
   route-map [name] permit [number]
-    set metric [number]
-    ! If route-map should only be applied for specific prefixes
-    match ip address [ACL name]
+    set {weight | local-preference | metric} [number]
   router bgp [AS]
-    neighbor [IP] remote-as [AS]
-    neighbor [IP] route-map [name] out",BGP
-BGP local preference manipulation configuration,"configure terminal
+    neighbor [IP] route-map [name] {in | out}",BGP Route-Map
+Route-Map that matches on ACL configuration,"configure terminal
   route-map [name] permit [number]
-    set local-preference [number]
-    ! If route-map should only be applied for specific prefixes
-    match ip address [ACL name]
-  router bgp [AS]
-    neighbor [IP] remote-as [AS]
-    neighbor [IP] route-map [name] in",BGP
-BGP weight manipulation configuration,"configure terminal
-  route-map [name] permit [number]
-    set weight [number]
-    ! If route-map should only be applied for specific prefixes
-    match ip address [ACL name]
-  router bgp [AS]
-    neighbor [IP] remote-as [AS]
-    neighbor [IP] route-map [name] in",BGP
-Well-known community for prefixes sent by a eBGP peer configuration,"configure terminal
+    match ip address [ACL name]",Route-Map
+Well-known community BGP configuration,"configure terminal
     route-map [name] permit [number]
       set community {internet | no-advertise | no-export | local-as}
-    ! If route-map should only be applied for specific prefixes
-    match ip address [ACL name]
   router bgp [AS]
-    neighbor [eBGP IP] remote-as [AS]
-    neighbor [eBGP IP] route-map [name] in
-    neighbor [iBGP IP] remote-as [AS]
-    neighbor [iBGP IP] send-community",BGP
-Well-known community for prefixes sent to a peer BGP configuration,"configure terminal
-    route-map [name] permit [number]
-      set community {internet | no-advertise | no-export | local-as}
-    ! If route-map should only be applied for specific prefixes
-    match ip address [ACL name]
-  router bgp [AS]
-    neighbor [IP] remote-as [AS]
-    neighbor [IP] route-map [name] out
-    neighbor [IP] send-community",BGP
+    neighbor [IP] route-map [name] {in | out}
+    neighbor [IP] send-community",BGP Route-Map
 BGP authentication configuration,"configure terminal
   router bgp [AS]
-    neighbor [IP] remote-as [AS]
     neighbor [IP] password [password]",BGP
 BGP summary route configuration with suppression of original routes,"configure terminal
   router bgp [AS]
@@ -162,7 +130,7 @@ Named EIGRP summary route configuration,"configure terminal
     address-family ipv{4 | 6} autonomous-system [number]
       af-interface [interface]
         summary-address [[IP] [mask] | [IPv6]/[prefix length]]",EIGRP
-Convert numberd EIGRP configuration to named EIGRP configuration,"configure terminal
+Convert numbered EIGRP configuration to named EIGRP configuration,"configure terminal
   router eigrp [number]
     eigrp upgrade-cli",EIGRP
 Named EIGRP route redistribution configuration,"configure terminal
@@ -177,10 +145,10 @@ Enable IPv6 routing and CEF,"configure terminal
   ipv6 unicast-routing
   ipv6 multicast-routing
   ipv6 cef",Routing
-Basic IPv4 configuration,"configure terminal
+Static IPv4 interface configuration,"configure terminal
   interface [interface]
     ip address [IP] [mask]",Routing
-Basic IPv6 configuration,"configure terminal
+Static IPv6 interface configuration,"configure terminal
   interface [interface]
     ipv6 enable
     ipv6 address [IPv6]/[prefix length]",Routing
@@ -197,7 +165,7 @@ Basic IPv6 static route configuration,"configure terminal
   ipv6 route [IPv6]/[prefix length] [exit-interface] [next-hop IPv6]",Routing
 Floating IPv6 static route configuration with tracking,"configure terminal
   ipv6 route [IPv6]/[prefix length] [exit-interface] [next-hop IPv6] [AD] track [number]",Routing
-Basic MPLS with OSPF configuration,"! OSPF must already be working beforehand
+Basic MPLS configuration with OSPF already configured,"! OSPF must already be working beforehand
 ! The LSR-IDs used by LDP must be advertised within OSPF
 
 configure terminal
@@ -261,10 +229,10 @@ OSPFv3 redistribution configuration,"configure terminal
       redistribute [source] [options]",OSPF
 OSPFv3 authentication configuration,"configure terminal
   interface [interface]
-    ospfv3 authentication ipsec spi [number] [algorithm] {0 | 7} [authentication key]",OSPF
+    ospfv3 authentication ipsec spi [number] [algorithm] [authentication key]",OSPF
 OSPFv3 authentication and encryption configuration,"configure terminal
   interface [interface]
-    ospfv3 encryption ipsec spi [number] esp [algorithm] {0 | 7} [encryption key] [algorithm] {0 | 7} [authentication key]",OSPF
+    ospfv3 encryption ipsec spi [number] esp [algorithm] [encryption key] [algorithm] [authentication key]",OSPF
 OSPFv3 default route advertisement configuration,"configure terminal
   router ospfv3 [number]
     address-familiy ipv{4 | 6}
@@ -360,22 +328,14 @@ Basic CBAC configuration,"configure terminal
        ip inspect [name] out
   interface [interface] 
        ip inspect [name] in",CBAC
-Dynamic ARP Inspection (DAI) configuration with DHCP Snooping,"! DHCP Snooping must work beforehand
-
-configure terminal
+Dynamic ARP Inspection (DAI) configuration with DHCP Snooping configured already,"configure terminal
   ip arp inspection vlan [VLAN range]
   interface range [range]
     ip arp inspection trust",DAI
-Dynamic ARP Inspection (DAI) configuration with DHCP Snooping and static filter,"! DHCP Snooping must work beforehand
-
-configure terminal
+Add an additional static filter for Dynamic ARP Inspection (DAI),"configure terminal
   arp access-list [name]
     {permit | deny} {request | response} ip host [IP] mac host [MAC]
   ip arp inspection filter [name] vlan [VLAN]",DAI
-Dynamic ARP Inspection (DAI) configuration with static entries,"configure terminal
-  arp access-list [name]
-    {permit | deny} {request | response} ip host [IP] mac host [MAC]
-  ip arp inspection filter [name] vlan [VLAN] static",DAI
 Dynamic ARP Inspection (DAI) additional validation configuration,"configure terminal
   ip arp inspection validate {src-mac | dst-mac | ip}",DAI
 Dynamic ARP Inspection (DAI) rate limit configuration,"configure terminal
@@ -397,10 +357,10 @@ Automatically recover interface after DHCP rate limit violation,"configure termi
   errdisable recovery interval [seconds]
   errdisable recovery cause dhcp-rate-limit",DHCP-Snooping
 Basic Port-Seucrity configuration,"configure terminal
-  switchport port-security
   switchport port-security max [number]
   switchport port-security mac {[mac] | sticky}
-  switchport port-security violation {protect | restrict | shutdown}",Port-Security
+  switchport port-security violation {protect | restrict | shutdown}
+  switchport port-security",Port-Security
 Automatically recover interface after Port-Security shutdown violation,"configure terminal
   errdisable recovery interval [seconds]
   errdisable recovery cause psecure-violation",Port-Security
@@ -417,32 +377,18 @@ Basic ZBF policy-map configuration,"configure terminal
 Basic ZBF zone pair configuration,"configure terminal
   zone security [zone name1]
   zone security [zone name2]
-  zone-pair security source [zone name1] destination [zone name2]
+  zone-pair security source {[zone-name1 | Self]} destination {[zone-name2] | Self}
     service-policy type inspect [policy-map name]
   interface [interface]
     zone-member security [zone name1]
   interface [interface]
     zone-member security [zone name2]",ZBF
-ZBF self zone zone-pair configuration,"configure terminal
-  zone security [zone]
-  zone-pair security source {zone | Self} destination {zone | Self}
-    service-policy type inspect [policy-map name]
-  interface [interface]
-    zone-member security [zone]",ZBF
-Basic PAGP Etherchannel configuration,"configure terminal
+Basic Etherchannel configuration,"configure terminal
   interface range [range]
-    channel-group [number] mode {desirable | auto}
-  interface port-channel [number]",Etherchannel
-Basic LACP Etherchannel configuration,"configure terminal
-  interface range [range]
-    channel-group [number] mode {active | passive}
-  interface port-channel [number]",Etherchannel
-Basic manual Etherchannel configuration,"configure terminal
-  interface range [range]
-    channel-group [number] mode on
+    channel-group [number] mode {desirable | auto | active | passive | on}
   interface port-channel [number]",Etherchannel
 Etherchannel load-balancing configuration,"configure terminal
-  port-channel load-balance {dst-ip | dst-mac | src-dst-ip | src-dst-mac | src-ip | src-mac}",Etherchannel
+  port-channel load-balance {src-mac | dst-mac | src-dst-mac | src-ip | dst-ip | src-dst-ip}",Etherchannel
 Rapid-PVST+ root bridge configuration,"configure terminal
   spanning-tree mode rapid-pvst
   spanning-tree vlan [VLAN] priority 0",STP
