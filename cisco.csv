@@ -70,7 +70,7 @@ eBGP peering via loopback configuration,"configure terminal
   router bgp [AS]
     neighbor [IP] remote-as [AS]
     neighbor [IP] update-source loopback [number]
-    neighbor [IP] ebgp-multi-hop 2",BGP
+    neighbor [IP] ebgp-multihop 2",BGP
 BGP Route Reflector (RR) configuration,"configure terminal
   router bgp [AS]        
     neighbor [IP] route-reflector-client ",BGP
@@ -107,7 +107,7 @@ Basic named EIGRP IPv4 configuration,"configure terminal
   router eigrp [name]
     address-family ipv4 autonomous-system [number]
       eigrp router-id [ID]
-        network [IP] [wildcard]
+      network [IP] [wildcard]
       af-interface default
         passive-interface
       af-interface [interface]
@@ -125,6 +125,16 @@ Named EIGRP authentication configuration,"configure terminal
     address-family ipv{4 | 6} autonomous-system [number]
       af-interface [interface]
         authentication mode [algorithm] [password]",EIGRP
+Named EIGRP increase metric configuration,"configure terminal
+  router eigrp [name]
+    address-family ipv{4 | 6} autonomous-system [number]
+      topology base
+        offset-list 0 out [additional metric] [interface]",EIGRP
+Named EIGRP disable split-horizon for DMVPN configuration,"configure terminal
+  router eigrp [name]
+    address-family ipv{4 | 6} autonomous-system [number]
+      af-interface [interface]
+        no split-horizon",EIGRP DMVPN
 Named EIGRP summary route configuration,"configure terminal
   router eigrp [name]
     address-family ipv{4 | 6} autonomous-system [number]
@@ -213,16 +223,16 @@ OSPFv2 inter-AS summary route configuration,"configure terminal
     summary-address [IP] [mask]",OSPF
 Basic OSPFv3 configuration,"configure terminal
   router ospfv3 [number]
-    router-id [ID]
-    area [number]
-    passive-interface default
-    no passive-interface [interface]
     address-family ipv{4 | 6}
+      router-id [ID]
+      passive-interface default
+      no passive-interface [interface]
   interface [interface]
     ospfv3 [number] ipv{4 | 6} area [number]",OSPF
 OSPFv3 reference bandwidth configuration,"configure terminal
   router ospfv3 [number]
-    auto-cost reference-bandwidth [Mbps]",OSPF
+    address-family ipv{4 | 6}
+      auto-cost reference-bandwidth [Mbps]",OSPF
 OSPFv3 redistribution configuration,"configure terminal
   router ospfv3 [number]
     address-family ipv{4 | 6}
@@ -235,21 +245,21 @@ OSPFv3 authentication and encryption configuration,"configure terminal
     ospfv3 encryption ipsec spi [number] esp [algorithm] [encryption key] [algorithm] [authentication key]",OSPF
 OSPFv3 default route advertisement configuration,"configure terminal
   router ospfv3 [number]
-    address-familiy ipv{4 | 6}
+    address-family ipv{4 | 6}
       default-information originate always",OSPF
 OSPFv3 priority configuration,"configure terminal
   interface [interface]
     ospfv3 [number] priority {0-255}",OSPF
-OSPFv3 network  type configuration,"configure terminal
+OSPFv3 network type configuration,"configure terminal
   interface [interface]
     ospfv3 [number] network {broadcast | non-broadcast | point-to-point | point-to-multipoint | point-to-multipoint non-broadcast}",OSPF
 OSPFv3 inter-area summary route configuration,"configure terminal
   router ospfv3 [number]
-    address-familiy ipv{4 | 6}
+    address-family ipv{4 | 6}
       area [number] range [[IP] [mask] | [IPv6]/[prefix length]]",OSPF
 OSPFv3 inter-AS summary route configuration,"configure terminal
   router ospfv3 [number]
-    address-familiy ipv{4 | 6}
+    address-family ipv{4 | 6}
       summary-prefix [[IP] [mask] | [IPv6]/[prefix length]]",OSPF
 Basic RIPv2 configuration,"configure terminal
   router rip
@@ -278,7 +288,6 @@ RIPv2 route redistribution configuration,"configure terminal
     redistribute [source] [options]",RIP
 Basic RADIUS configuration,"configure terminal 
   aaa new-model 
-  aaa local authentication attempts max-fail [number]
   aaa authentication login default group radius local 
   aaa authorization exec default group radius local
   aaa authorization console
@@ -286,6 +295,8 @@ Basic RADIUS configuration,"configure terminal
     address ipv4 [IP] auth-port [port] acct-port [port]
     key [password]
   ip radius source-interface [interface]",AAA
+RADIUS maximum authentication attempts configuration,"configure terminal 
+  aaa local authentication attempts max-fail [number]",AAA
 Create a privilege level which has access to one specific command in configuration mode,"configure terminal
   privilege exec level {0-15} configure terminal
   privilege configure level {0-15} [command]",AAA
@@ -335,6 +346,7 @@ Dynamic ARP Inspection (DAI) configuration with DHCP Snooping configured already
 Add an additional static filter for Dynamic ARP Inspection (DAI),"configure terminal
   arp access-list [name]
     {permit | deny} {request | response} ip host [IP] mac host [MAC]
+  ip arp inspection vlan [VLAN]
   ip arp inspection filter [name] vlan [VLAN]",DAI
 Dynamic ARP Inspection (DAI) additional validation configuration,"configure terminal
   ip arp inspection validate {src-mac | dst-mac | ip}",DAI
@@ -457,7 +469,8 @@ configure terminal
   vtp domain [domain]
   vtp version 3
   vtp mode server
-  vtp primary force",VLAN VTP
+  exit
+vtp primary force",VLAN VTP
 Basic VTPv3 backup server configuration,"configure terminal
   vtp domain [domain]
   vtp version 3
@@ -529,7 +542,6 @@ Basic phase 3 DMVPN hub configuration,"configure terminal
     tunnel key [number]",DMVPN
 Basic phase 3 DMVPN single cloud multi hub secondary hub configuration,"configure terminal
   int tunnel [number]
-    bandwidth [primary hub bandwidth - 1]
     ip address [IP] [mask]
     ip nhrp authentication [password]
     ip nhrp network-id [number]
@@ -569,7 +581,7 @@ Basic phase 3 DMVPN single cloud multi hub spoke configuration,"configure termin
     tunnel source [interface]
     tunnel mode gre multipoint
     tunnel key [number]",DMVPN
-DMVPN IPsec IPsec configuration,"configure terminal
+DMVPN IPsec protection configuration,"configure terminal
   interface tunnel [number]
   tunnel protection ipsec profile [name]",DMVPN IPsec
 Basic GRE configuration,"configure terminal
@@ -578,7 +590,7 @@ Basic GRE configuration,"configure terminal
     tunnel source [interface]
     tunnel destination [IP]",GRE
 Basic IKEv1/ISAKMP/IPsec VPN configuration with crypto map,"configure terminal
-  crypto isakmp policy [number]
+  crypto isakmp policy [name]
     authentication pre-share
     group [group]
     encryption [algorithm]
@@ -594,7 +606,7 @@ Basic IKEv1/ISAKMP/IPsec VPN configuration with crypto map,"configure terminal
   int [outside interface]
     crypto map [name]",IPsec
 Basic IKEv1/ISAKMP/IPsec VPN configuration with VTI,"configure terminal
-  crypto isakmp policy [number]
+  crypto isakmp policy [name]
     authentication pre-share
     group [group]
     encryption [algorithm]
@@ -623,7 +635,7 @@ Basic IKEv2/IPsec VPN configuration with crypto map,"configure terminal
   crypto ikev2 policy [name]
     proposal [name]
   crypto ikev2 profile [name]
-    identity remote address [peer IP] [mask]
+    match identity remote address [peer IP] [mask]
     authentication local pre-share
     authentication remote pre-share
     keyring local [name]
@@ -632,8 +644,10 @@ Basic IKEv2/IPsec VPN configuration with crypto map,"configure terminal
     set peer [peer IP]
     set ikev2 profile [name]
     set transfom-set [name]
-    set pfs [DH group]
-    match address [ACL]",IPsec
+    set pfs group[DH number]
+    match address [ACL]
+  int [outside interface]
+    crypto map [name]",IPsec
 Basic IKEv2/IPsec VPN configuration with VTI,"configure terminal
   crypto ikev2 keyring [name]
     peer [name]
@@ -646,7 +660,7 @@ Basic IKEv2/IPsec VPN configuration with VTI,"configure terminal
   crypto ikev2 policy [name]
     proposal [name]
   crypto ikev2 profile [name]
-    identity remote address [peer IP] [mask]
+    match identity remote address [peer IP] [mask]
     authentication local pre-share
     authentication remote pre-share
     keyring local [name]
@@ -654,7 +668,7 @@ Basic IKEv2/IPsec VPN configuration with VTI,"configure terminal
   crypto ipsec profile [name]
     set ikev2 profile [name]
     set transfom-set [name]
-    set pfs [DH group]
+    set pfs group[DH number]
   int tunnel [number]
     tunnel mode ipsec ipv4
     ip addresss [IP] [mask]
@@ -668,7 +682,7 @@ IKEv2/IPsec VPN keyring configuration for DMVPN,"configure terminal
       pre-shared-key [password]",IPsec DMVPN
 IKEv2/IPsec VPN profile configuration for DMVPN,"configure terminal  
   crypto ikev2 profile [name]
-    identity remote any
+    match identity remote any
     authentication local pre-share
     authentication remote pre-share
     keyring local [name]",IPsec DMVPN
@@ -690,7 +704,8 @@ Bidirectional CHAP authentication PPPoeE client configuration,"configure termina
     ! If server and client both use the same username
     no ppp chap ignoreus",PPPoE CHAP
 Unidirectional CHAP authentication PPPoeE client configuration,"configure terminal
-  interface dialer [number]    
+  interface dialer [number]
+    ppp authentication chap callout
     ppp chap hostname [username on  server]
     ppp chap password [password on server]",PPPoE CHAP
 Basic PPPoE server configuration,"configure terminal
@@ -716,11 +731,13 @@ Bidirectional CHAP authentication PPPoE server configuration,"configure terminal
 Unidirectional CHAP authentication PPPoE server configuration,"configure terminal
   username [username] password [password]
   interface virtual-template [number]
-    ppp authentication chap",PPPoE CHAP
+    ppp authentication chap callin",PPPoE CHAP
 Basic SSH server configuration,"configure terminal
   ip ssh version {1 | 2}
   crypto key generate rsa usage-keys modulo {360-4096} label [label]
-  ip ssh key-pair [label]",SSH
+  ip ssh rsa keypair [label]
+  line vty [first] [last]
+    transport input ssh",SSH
 SSH server retry limit configuration,"configure terminal
   ip ssh authentication-retries [number]
   ip ssh time-out [seconds]",SSH
@@ -734,17 +751,17 @@ Basic connection tracking configuration,"configure terminal
   track [number] ip sla [number] reachability",Tracking
 Basic interface tracking configuration,"configure terminal
   track [number] interface [interface] line-protocol",Tracking
+DHCP address exclusion configuration,"configure terminal
+  ip dhcp excluded-address [first IP] [last IP]",
 Basic DHCP server configuration,"configure terminal
   service dhcp
-    ip dhcp excluded-address [first IP] [last IP]
-    ip dhcp pool [name]
-      network [IP] [mask]
-      default-router [IP]
-      dns-server [IP]
-      domain-name [name]",DHCP
+  ip dhcp pool [name]
+    network [IP] [mask]
+    default-router [IP]
+    dns-server [IP]
+    domain-name [name]",DHCP
 DHCP server lease reservation configuration,"configure terminal
   service dhcp
-    ip dhcp excluded-address [first IP] [last IP]
     ip dhcp pool [name]
       host [IP] [mask]
       client-identifier [client identifier]
@@ -757,13 +774,10 @@ Basic DHCP relay agent configuration,"configure terminal
 Basic DHCP client configuration,"configure  terminal
   interface [interface]
     ip address dhcp",DHCP
-Basic NTP client configuration,"configure terminal
+Basic NTP server/client configuration,"configure terminal
   ntp server [IP] source [interface]",Time NTP
 Basic Standalone NTP server configuration,"configure terminal
   ntp master [stratum]",Time NTP
-Basic NTP client and server configuration,"configure terminal
-  ntp server [IP] source [interface]
-  ntp master",Time NTP
 NTP authentication configuration,"configure terminal
   ntp authentication-key [number] [algorithm] [password]
   ntp trusted-key [number]
@@ -822,6 +836,11 @@ Static reverse NAT64 configuration,"configure terminal
     nat64 enable",NAT64
 NAT64 custom prefix configuration,"configure terminal
   nat64 prefix stateful [IPv6]/[prefix length]",NAT64
+Basic key-chain configuration,"configure terminal
+  key chain [name]
+    key [number]
+      cryptographic-algorithm [algorithm]
+      key-string [password]",Authentication
 Basic 6 to 4 tunneling configuration,"configure terminal
   interface loopback [number]
     ip address [6to4 IPv6]/128
@@ -836,10 +855,6 @@ Basic VRRPv2 configuration,"configure terminal
     vrrp [number] priority [1-254]
     vrrp [number] preempt delay minimum [seconds]",VRRP
 VRRPv2 authentication configuration,"configure terminal
-  key chain [name]
-    key [number]
-      cryptographic-algorithm [algorithm]
-      key-string [password]
   interface [interface]
     vrrp [number] authentication [algorithm] key-chain [name]",VRRP
 VRRPv2 tracking object configuration,"configure terminal
@@ -887,10 +902,6 @@ HSRP tracking object configuration,"configure terminal
   interface [interface]
     standby [number] track [number] decrement [number]",HSRP
 HSRP authentication configuration,"configure terminal
-  key chain [name]
-    key [number]
-      cryptographic-algorithm [algorithm]
-      key-string [password]
   interface [interface]
     standby [number] authentication [algorithm] key-chain [name]",HSRP
 Basic GLBP IPv4 configuration,"configure terminal
@@ -909,10 +920,6 @@ GLBP tracking object configuration,"configure terminal
     glbp [number] weighting [number] lower [number] upper [number]
     glbp [number] weighting track [number] decrement [number]",GLBP
 GLBP authentication configuration,"configure terminal
-  key chain [name]
-    key [number]
-      cryptographic-algorithm [algorithm]
-      key-string [password]
   interface [interface]
     glbp [number] authentication [algorithm] key-chain [name]",GLBP
 GLBP load balacing configuration,"configure terminal
