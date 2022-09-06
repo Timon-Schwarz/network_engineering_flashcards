@@ -1,69 +1,41 @@
-First Domain Controller configuration,"Install-WindowsFeature AD-Domain-Services -IncludeManagementTools
-Install-ADDSForest -DomainName [domain] -NetbiosName [netbios] -InstallDns",Active Directory (AD)
-Additional Domain Controller configuration,"Install-WindowsFeature AD-Domain-Services -IncludeManagementTools
-Install-ADDSDomainController -DomainName [domain] -InstallDNS -Credential (Get-Credentials ""[netbios]\[user]"") -SiteName [site]",Active Directory (AD)
-Child Domain Domain Controller configuration,"Install-WindowsFeature AD-Domain-Services -IncludeManagementTools
-Install-ADDS-Domain -ParentDomainName [domain] -NewDomainName [prefix] -NewNetbiosName [netbios] -InstallDNS -SiteName [site] -Credential (Get-Credentials ""[netbios]\[user]"")",Active Directory (AD)
-Script that creates Active Directory users from CSV file,"param ($path, $delimiter) 
-
-# Import active directory module for running AD cmdlets 
-Import-Module ActiveDirectory 
-
-$ADUsers = Import-Csv $path -Delimiter $delimiter | Foreach-Object {
-    $user = @{
-        Name               = $_.Name
-        GivenName          = $_.GivenName
-        SurName            = $_.SurName
-        SamAccountName     = $_.SamAccount
-        AccountPassword    = (ConvertTo-secureString $_.Password -AsPlainText -Force)
-        EmailAddress       = $_.Email
-        OfficePhone        = $_.Phone
-        City               = $_.City
-        Title              = $_.Title
-        Organization       = $_.Organization
-        Path               = $_.Path
-        HomeDirectory      = ""\\FR-FILE\homes\%username%""
-        HomeDrive          = ""H:""
-        ProfilePath        = ""\\FR-FILE\profiles\%username%""
-    }
-    if (Get-ADUser -F { SamAccountName -eq ""$user.SamAccountName"" }) {
-        Write-Warning ""User already exists: $user""
-    } 
-    else {
-        try {
-            New-ADUser @user -ErrorAction Stop
-        } catch {
-            Write-Debug ([PSCustomObject]$user)    # output parameter info
-            $_                                     # output the actual error
-        }
-    }
-}",Active Directory (AD)
-Split-Brain DNS configuration,"# Do standard DNS zone configuration before
-# Do not forget that the DNS Server itself will use its loopback as source address
-# Do not forget that the DNS Server itself will prefer its IPv6 loopback address over its IPv4 address
-
-Add-DnsServerZoneScope -ZoneName [name] -Name [scope name]
-Add-DnsServerResourceRecord -ZoneName [name] -A -Name [host name] -IPv4Address [IP] -ZoneScope [scope]
-Add-DnsServerClientSubnet -Name [subnet name] -IPv4Subnet [CIDR]
-Add-DnsServerQueryResolutionPolicy -Name [policy name] -Action ALLOW -ClientSubnet ""{EQ/NE},[subnet name 1],[subnet name  ...]"" -ZoneScope ""[scope name]"" -ZoneName [name] -ProcessingOrder [Order]",Domain Name Service (DNS)
-Name of the program with which the hostname and domain can be configured,sysdm.cpl,General
-Name of the program with which network interfaces can be configured,ncpa.cpl,Networking
-Basic core server configuration,sconfig,General
-Reboot core server,Stop-Computer,General
-Shutdown core server,Restart-Computer,General
-Disable IPv6 via PowerShell,Get-NetAdapterBinding | Where-Object ComponentID -EQ 'ms_tcpip6' | Disable-NetAdapter,Networking
-Allow remote management from device outside of the domain configuration,"winrm qc
-Enable-PSRemoting -force
-Set-Item WSMan:localhost\client\trustedhosts -value {[IP]/[hostname]/[domain]/*]} -Concatenate
-New-NetFirewallRule -DisplayName [name] -Direction Inbound -Action Allow -Protocol TCP -LocalPort 5985",Windows Remote Management (WinRM)
-Allow remote management to device outside of the domain configuration,Set-Item WSMan:localhost\client\trustedhosts -value {[IP]/[hostname]/[domain]/*]} -Concatenate,Windows Remote Management (WinRM)
-Enable/Disable firewall via powershell,"Set-NetFirewallProfile -Profile Private,Domain,Public -Enable {True/False}",Networking
-Update PowerShell help information from offline path,Update-Help -SourcePath [path],General
-Different ways to get help for a powershell command,"help [command] -full
-help [command] -example
-help [command] -detail
-help [command] -paramter [Paramteter]",General
-NTP client configuration for PDC Master,"net stop w32tm
-w32tm /config /SyncFromFlags:manual /ManualPeerList:""[IP],0x8"" /reliable:yes /update
-w32tm /config /update
-net start w32tm",Network Time Protocol (NTP)
+"Start the program with which host- and domain name can be configured","sysdm.cpl","General ADDS Program-Names"
+"Start the program with which network interfaces can be configured","ncpa.cpl","General ADDS Program-Names"
+"Start the program user certificates can be configured","certmgr.msc","CA Program-Names"
+"Start the program machine certificates can be configured","certlm.msc","CA Program-Names"
+"Start the program with which services can be configured","services.msc","Program-Names General"
+"Shutdown the machine","Stop-Computer","General"
+"Reboot the machine","Restart-Computer","General"
+"Disable IPv6 via PowerShell","Get-NetAdapterBinding | Where-Object ComponentID -EQ 'ms_tcpip6' | Disable-NetAdapterBinding","General"
+"Enable/Disable firewall via PowerShell","Set-NetFirewallProfile -All -Enable {True | False}","General"
+"Get additional information for a command","help [command]","General"
+"Update PowerShell help information from offline path","Update-Help -SourcePath [path]","General"
+"Complete the baseline configuration","sconfig","General"
+"Create new forest and domain ","Install-WindowsFeature AD-Domain-Services -IncludeManagementTools<br>Install-ADDSForest -DomainName [domain] -DomainNetbiosName [netbios] -InstallDns","ADDS DNS"
+"Add a Domain Controller to an existing domain","Install-WindowsFeature AD-Domain-Services -IncludeManagementTools<br>Install-ADDSDomainController -DomainName [domain] -InstallDNS -Credential (Get-Credentials ,[netbios]\[user],) -SiteName [site]","ADDS DNS"
+"Add a child domain to an existing forest","Install-WindowsFeature AD-Domain-Services -IncludeManagementTools<br>Install-ADDS-Domain -ParentDomainName [domain] -NewDomainName [prefix] -NewNetbiosName [netbios] -InstallDNS -SiteName [site] -Credential (Get-Credentials ,[netbios]\[user],)","ADDS DNS"
+"Create AD users from CSV file via script.<br>The home and profile locations as well as the group membership of all users shall also be altered.<br>All information included in the CSV must be used for user creation.<br>The headings of the CSV file are the following:<br>Name, GivenName, SurName, SamAccount, Password, Email, OfficePhone, City, Title, Organization, Group, Path","param ($path, $delimiter) <br>Import-Module ActiveDirectory <br>Import-Csv $path -Delimiter $delimiter | Foreach-Object {<br>  $user = @{<br>      Name               = $_.Name<br>      GivenName          = $_.GivenName<br>      SurName            = $_.SurName<br>      SamAccountName     = $_.SamAccount<br>      AccountPassword    = (ConvertTo-SecureString -AsPlainText $_.Password -Force)<br>      EmailAddress       = $_.Email<br>      OfficePhone        = $_.OfficePhone<br>      City               = $_.City<br>      Title              = $_.Title<br>      Organization       = $_.Organization<br>      Path               = $_.Path<br>      HomeDirectory      = ,\\FR-FILE\homes\%username%,<br>      HomeDrive          = ,H:,<br>      ProfilePath        = ,\\FR-FILE\profiles\%username%,<br>      Enabled            = $True<br>  }<br>  Write-Debug ,Adding user: $user,<br>  New-ADUser @user<br>  Add-ADGroupMember -Identity $_.Group -Members $user.SamAccountName<br>}","ADDS Script"
+"Add an external domain view via Split-Brain DNS configuration","# Do standard DNS zone configuration before<br><br>Add-DnsServerZoneScope -ZoneName [name] -Name [scope name]<br>Add-DnsServerClientSubnet -Name Local -IPv4Subnet 127.0.0.0/8<br>Add-DnsServerClientSubnet -Name Private1 -IPv4Subnet 10.0.0.0/8<br>Add-DnsServerClientSubnet -Name Private2 -IPv4Subnet 172.16.0/20<br>Add-DnsServerClientSubnet -Name Private3 -IPv4Subnet 192.168.0.0/16<br>Add-DnsServerQueryResolutionPolicy -Name [policy name] -ZoneName [name] -ZoneScope [name] -ClientSubnet ,NE,Local,Private1,Private2,Private3,<br>Add-DnsServerResourceRecord -ZoneName [name] -A -Name [host name] -IPv4Address [IP] -ZoneScope [scope]","DNS"
+"Setup BGP with prefix advertisement and an eBGP peer","Install-WindowsFeature Routing -IncludeManagementTools<br>Install-RemoteAccess -VpnType RoutingOnly<br>Add-BgpRouter -BgpIdentifier [ID] -LocalASN [AS]<br>Add-BgpPeer -LocalIPAddress [IP] -PeerIPAddress [IP] -PeerASN [AS] -Name [name]<br>Add-BgpCustomRoute -network [IP]/[mask]","BGP"
+"Install the required features for S2S VPN","Install-WindowsFeature DirectAccess-VPN -IncludeManagementTools<br>Install-RemoteAccess -VpnType VpnS2S",
+"Setup an IKEv2 S2S VPN with PSK","Install-WindowsFeature DirectAccess-VPN -IncludeManagementTools<br>Install-RemoteAccess -VpnType VpnS2S<br>Add-VpnS2SInterface -Name [name] -Protocol IKEv2 -SourceIPAddress [IP] -Destination [IP] -AuthenticationMethod PSKOnly -SharedSecret [password] -IPv4Subnet @(,[IP1]/[mask1]:[priority1],,,[IPx]/[maskx]:[priorityx],) -Persistent -AutoConnectEnabled $True<br>Connect-VpnS2SInterface -Name [name]",
+"Install all Remote Management Tools","Install-WindowsFeature RSAT -IncludeAllSubFeature -IncludeManagementTools","Management"
+"Remotely enable remote firewall management","Enable-NetFirewallRule -DisplayGroup Windows-Firewallremoteverwaltung -CimSession [hostname]","Management"
+"Set the NTP server for the PDC Master","net stop w32tm<br>w32tm /config /SyncFromFlags:manual /ManualPeerList:,[IP],0x8, /reliable:yes /update<br>w32tm /config /update<br>net start w32tm<br>","NTP"
+"Configure one to one NAT","Install-WindowsFeature Routing -IncludeManagementTools<br>Install-RemoteAccess -VpnType RoutingOnly<br>cmd.exe /c 'netsh routing ip nat show add addressmapping name=,[name], [external IP] [internal IP] enable'","NAT"
+"Configure PAT","Install-WindowsFeature Routing -IncludeManagementTools<br>Install-RemoteAccess -VpnType RoutingOnly<br>cmd.exe /c 'netsh routing ip nat add interface ,[internal interface], mode=private'<br>cmd.exe /c 'netsh routing ip nat add interface ,[external interface], mode=full'","NAT"
+"Configure Port Forwarding","Install-WindowsFeature Routing -IncludeManagementTools<br>Install-RemoteAccess -VpnType RoutingOnly<br>cmd.exe /c 'netsh routing ip nat add portmapping name=,[external interface], {tpc | udp} [external IP] [external port] [internal IP] [internal port]'","NAT"
+"Setup an Enterprise Subordinate CA","#C:\Windows\System32\CAPolicy.inf<br>[Version]<br>Signature=$Windows NT$<br>[PolicyStatementExtension]<br>Policies=InternalPolicy<br>[InternalPolicy]<br>OID=[OID]<br>Notice=,[message],<br>[Certsrv_Server]<br>RenewalKeyLength=4096<br>RenewalValidityPeriod={Years | Months | Weeks | Days}<br>RenewalValidityPeriodUnits=[number]<br>CRLPeriod={Years | Months | Weeks | Days}<br>CRLPeriodUnits=[number]<br>CRLDeltaPeriod={Years | Months | Weeks | Days}<br>CRLDeltaPeriodUnits=[number]<br>AlternateSignatureAlgorithm=1<br>LoadDefaultTemplates=0<br>#C:\Windows\System32\CAPolicy.inf<br><br>Install-WindowsFeature -ADCS-Cert-Authority -IncludeManagementTools<br>Install-AdcsCertificationAuthority -CACommonName [CN] -CAType EnterpriseSubordinateCA -KeyLength 4096<br><br>#Get the certificate singed by parent CA<br><br>certutil -installCert [file]<br># change crl and aia in gui because it is faster<br># restart service in gui because it is faster<br># publish crl in gui because it is faster<br># add templates in gui because it is faster","PKI"
+"Setup an IIS Web Server for CDP and AIA certificate hosting","Install-WindowsFeature Web-Server -IncludeManagementTools<br>#add virtual directory in gui because it is faster<br>#allow double escaping in request filtering settings in gui because it is faster<br># copy all certificates to web server directory","Web PKI ISS"
+"Setup ADFS","Install-WindowsFeature ADFS-Federation -IncludeManagementTools<br>Add-KdsRootKey -EffectiveImmediately<br># Create CNAME<br># Create Certificate with enterpriserigister.","ADFS"
+"List the path to GPO which controls certificate auto enrollment","Computer Configuration<br>Policies<br>Windows Settings<br>Security Settings<br>Public Key Policies<br>Certificate Service Client - Auto Enrollment","ADDS GPO CA"
+"List the path to GPO which controls the first sign-in animation","Computer Configuration<br>Administrative Templates<br>System<br>Logon<br>Show first sign-in animation","ADDS GPO"
+"List the path to GPO which controls drive mappings","User Configuration<br>Preferences<br>Windows Settings<br>Drive Maps","ADDS GPO"
+"Setup SNMPv2 agent with a read only community","Install-WindowsFeature SNMP-Service -IncludeManagementTools<br># configure SNMP service in gui because it is faster","SNMP"
+"Setup SMB shares","Install-WindowsFeature FS-FileServer -IncludeManagementTools<br># Create SMB shares via gui because it is faster","SMB"
+"Setup Quota via File Server Resource Manger","Install-WindowsFeature FS-Resource-Manager -IncludeManagementTools<br># Add quota via gui because it is faster","SMB FSRM"
+"Disallow executable files to be saved via File Server Resource Manger","Install-WindowsFeature FS-Resource-Manager -IncludeManagementTools<br># Add file screening via gui because it is faster","SMB FSRM"
+"Setup RDS","# These commands must not be executed on the future connection broker otherwise the installation will fail<br><br>Import-Module RemoteDesktop<br>New-RDSessionDeployment -ConnectionBroker [FQDN] -SessionHost [FQDN] -WebAccessServer [FQDN]","RDS"
+"List the path to the GPO which controls the clients default connection URL for RDS","Configuration<br>Policies<br>Administrative Templates<br>Windows Components<br>Remote Desktop Service<br>RemoteApp and Desktop Connections<br>Default Connection URL","RDS GPO"
+"Allow remote management from device outside of the domain","winrm qc<br>Enable-PSRemoting -force<br>Set-Item WSMan:localhost\client\trustedhosts -value {[IP]/[hostname]/[domain]/*]} -Concatenate<br>New-NetFirewallRule -DisplayName [name] -Direction Inbound -Action Allow -Protocol TCP -LocalPort 5985","Management"
+"Allow remote management to device outside of the domain","Set-Item WSMan:localhost\client\trustedhosts -value {[IP]/[hostname]/[domain]/*]} -Concatenate","Management"
+"List all tests performed by Microsoft NCSI active probes","Resolve ,www.msftconnecttest.com,<br>HTTP Get ,http://www.msftconnecttest.com/connecttest.txt,<br>Check if file contains ,Microsoft Connect Test,<br>Resolv ,dns.msftncsi.com,","NCSI"
