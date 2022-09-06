@@ -732,7 +732,10 @@ Unidirectional CHAP authentication PPPoE server configuration,"configure termina
   username [username] password [password]
   interface virtual-template [number]
     ppp authentication chap callin",PPPoE CHAP
-Basic SSH server configuration,"configure terminal
+Basic SSH server configuration,"# ensure that the hostname is configured correctly
+# ensure that the domain name is configured correctly
+
+configure terminal
   ip ssh version {1 | 2}
   crypto key generate rsa usage-keys modulo {360-4096} label [label]
   ip ssh rsa keypair [label]
@@ -925,3 +928,32 @@ GLBP authentication configuration,"configure terminal
 GLBP load balacing configuration,"configure terminal
   interface [interface]
     glbp [number] load-balancing {host-dependent | round-robin | weighted}",GLBP
+Basic SNMPv2 read only community configuration,"configure terminal
+  snmp-server community [name] RO",SNMP
+SNMPv2c add trap configuration,"configure terminal
+  snmp-server host [IP] version 2c [community]
+  snmp-server enable traps",SNMP
+Basic read only SNMPv3 configuration with authentication and encryption,"configure terminal
+  snmp-server group [name] v3 priv
+  snmp-server user [name] [group name] v3 auth [hash] [password] priv [encryption] [key length] [password]",SNMP
+SNMPv3 add trap with authentication and encryption configuration,"configure terminal
+  snmp-server host [IP] traps version 3 priv [user]
+  snmp-server enable traps",SNMP
+SNMP set location configuration,"configure terminal
+  snmp-server location [location]",SNMP
+SNMP set contact configuration,"configure terminal
+  snmp-server contact [email]",SNMP
+Basic SYSLOG configuration,"configure terminal
+  logging [IP]
+  logging source-interface [interface]
+  logging on",SYSLOG
+SYSLOG log level configuration,"configure terminal 
+  logging trap [level]",SYSLOG
+List all SYSLOG levels,"7 Emergency
+6 Alert
+5 Critial
+4 Error
+3 Warning
+2 Notification
+1 Information
+0 Debug",SYSLOG
